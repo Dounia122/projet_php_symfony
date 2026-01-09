@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Messages{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-12">
+        <!-- Header Section -->
+        <div class="card-modern mb-4">
+            <div class="card-header-custom">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h1><i class="fas fa-inbox me-3"></i>Messages reçus</h1>
+                        <div class="subtitle">Gestion de tous les contacts reçus</div>
+                    </div>
+                    <a href="{{ path('app_contact') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Nouveau message
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        {% if contacts|length > 0 %}
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <i class="fas fa-envelope fa-2x mb-2"></i>
+                    <h3>{{ contacts|length }}</h3>
+                    <p>Message(s) total</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h3>{{ contacts|unique((c) => c.email)|length }}</h3>
+                    <p>Personne(s) unique(s)</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <i class="fas fa-check-double fa-2x mb-2"></i>
+                    <h3>100%</h3>
+                    <p>Taux de complétion</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Messages Table -->
+        {% if contacts|length > 0 %}
+            <div class="card-modern">
+                <div class="table-responsive">
+                    <table class="table table-modern table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">
+                                    <i class="fas fa-hashtag"></i>
+                                </th>
+                                <th style="width: 25%;">
+                                    <i class="fas fa-user me-2"></i>Nom
+                                </th>
+                                <th style="width: 25%;">
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </th>
+                                <th style="width: 35%;">
+                                    <i class="fas fa-comment me-2"></i>Message
+                                </th>
+                                <th style="width: 10%; text-align: center;">
+                                    <i class="fas fa-cog"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                                <tr>
+                                    <td>
+                                        <span class="badge-status badge-new">
+                                            #{{ contact.id }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar me-2" style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">
+                                                {{ contact.name|first|upper }}
+                                            </div>
+                                            <div>
+                                                <strong>{{ contact.name }}</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                            <i class="fas fa-envelope me-2" style="color: var(--primary-color);"></i>
+                                            {{ contact.email }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted" title="{{ contact.message }}">
+                                            <i class="fas fa-quote-left me-1" style="opacity: 0.5;"></i>
+                                            {{ contact.message|truncate(40, true, '...') }}
+                                        </small>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#messageModal{{ contact.id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal pour voir le message complet -->
+                                <div class="modal fade" id="messageModal{{ contact.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none;">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-envelope me-2"></i>Message de {{ contact.name }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body p-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Expéditeur</label>
+                                                    <div class="p-2 bg-light rounded">
+                                                        <i class="fas fa-user me-2"></i>{{ contact.name }}<br>
+                                                        <i class="fas fa-envelope me-2"></i>
+                                                        <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Message</label>
+                                                    <div class="p-3 bg-light rounded" style="border-left: 4px solid var(--primary-color);">
+                                                        {{ contact.message }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                <a href="mailto:{{ contact.email }}" class="btn btn-primary">
+                                                    <i class="fas fa-reply me-2"></i>Répondre
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination Info -->
+            <div class="mt-4 p-3 text-center">
+                <p class="text-muted">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Affichage de <strong>{{ contacts|length }}</strong> message(s)
+                </p>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="card-modern">
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h4>Aucun message pour le moment</h4>
+                    <p>Vous n'avez pas encore reçu de messages. Soyez patient!</p>
+                    <a href="{{ path('app_contact') }}" class="btn btn-submit">
+                        <i class="fas fa-arrow-left me-2"></i>Retour au formulaire
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
